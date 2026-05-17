@@ -136,19 +136,25 @@ Filter
 
 <table>
 
-<tr>
-
-<th>ID</th>
-<th>Issue</th>
-<th>Category</th>
-<th>Priority</th>
-<th>Action</th>
-
-</tr>
-
 {% for ticket in tickets %}
 
 <tr>
+
+<td>{{ticket.id}}</td>
+
+<td>{{ticket.issue_text}}</td>
+
+<td>{{ticket.category}}</td>
+
+<td>{{ticket.priority}}</td>
+
+<td>{{ticket.status}}</td>
+
+<td>{{ticket.assigned_to}}</td>
+
+</tr>
+
+{% endfor %}
 
 <td>{{ticket[0]}}</td>
 <td>{{ticket[1]}}</td>
