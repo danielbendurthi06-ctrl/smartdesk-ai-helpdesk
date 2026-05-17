@@ -48,9 +48,11 @@ color:white;
 td{
 padding:12px;
 background:rgba(255,255,255,0.05);
+text-align:center;
+color:white;
 }
 
-input, textarea{
+input{
 padding:10px;
 border:none;
 border-radius:10px;
@@ -117,21 +119,22 @@ background:red;
 
 <tr>
 
-<td>{{ticket[0]}}</td>
-<td>{{ticket[1]}}</td>
-<td>{{ticket[2]}}</td>
-<td>{{ticket[3]}}</td>
-<td>{{ticket[4]}}</td>
-<td>{{ticket[5]}}</td>
+<td>{{ticket.id}}</td>
 
-<td>
+<td>{{ticket.issue_text}}</td>
 
-<td>
+<td>{{ticket.category}}</td>
+
+<td>{{ticket.priority}}</td>
+
+<td>{{ticket.status}}</td>
+
+<td>{{ticket.assigned_to}}</td>
 
 <td>
 
 <form
-action="/assign/{{ticket[0]}}"
+action="/assign/{{ticket.id}}"
 method="POST">
 
 <input
@@ -149,34 +152,16 @@ Assign
 <br>
 
 <a
-href="/resolve/{{ticket[0]}}"
+href="/resolve/{{ticket.id}}"
 class="resolve">
 Resolve
 </a>
 
 <a
-href="/delete_ticket/{{ticket[0]}}"
+href="/delete_ticket/{{ticket.id}}"
 class="delete">
 Delete
 </a>
-
-</td>
-
-<br>
-
-<a
-href="/resolve/{{ticket[0]}}"
-class="resolve">
-Resolve
-</a>
-
-<a
-href="/delete_ticket/{{ticket[0]}}"
-class="delete">
-Delete
-</a>
-
-</td>
 
 </td>
 
