@@ -1,24 +1,29 @@
 from flask_mail import Mail, Message
 from flask import Flask, render_template, request, redirect, session
-from db import conn, cursor
+from flask_sqlalchemy import SQLAlchemy
 import joblib
+import os
+import pandas as pd
 
 print("SMARTDESK STARTED")
 
 app = Flask(__name__)
 
+# SQLITE DATABASE
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///smartdesk.db'
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+
+db = SQLAlchemy(app)
+
+# SECRET KEY
 app.secret_key = "smartdesk_secret"
 
-import os
-
+# MAIL CONFIGURATION
 app.config['MAIL_SERVER'] = 'smtp.gmail.com'
-
 app.config['MAIL_PORT'] = 587
-
 app.config['MAIL_USE_TLS'] = True
 
 app.config['MAIL_USERNAME'] = os.environ.get('MAIL_USERNAME')
-
 app.config['MAIL_PASSWORD'] = os.environ.get('MAIL_PASSWORD')
 
 mail = Mail(app)
@@ -32,6 +37,53 @@ priority_model = joblib.load(
     'priority_model.pkl'
 )
 
+# USER TABLE
+class User(db.Model):
+
+    id = db.Column(
+        db.Integer,
+        primary_key=True
+    )
+
+    username = db.Column(
+        db.String(100)
+    )
+
+    email = db.Column(
+        db.String(100)
+    )
+
+    password = db.Column(
+        db.String(100)
+    )
+
+# TICKET TABLE
+class Ticket(db.Model):
+
+    id = db.Column(
+        db.Integer,
+        primary_key=True
+    )
+
+    issue_text = db.Column(
+        db.Text
+    )
+
+    category = db.Column(
+        db.String(100)
+    )
+
+    priority = db.Column(
+        db.String(50)
+    )
+
+    status = db.Column(
+        db.String(50)
+    )
+
+    assigned_to = db.Column(
+        db.String(100)
+    )
 
 # HOME
 @app.route('/')
@@ -40,7 +92,6 @@ def home():
     return redirect(
         '/login'
     )
-
 
 # REGISTER
 @app.route('/register', methods=['GET', 'POST'])
@@ -52,27 +103,23 @@ def register():
         email = request.form['email']
         password = request.form['password']
 
-        query = """
-        INSERT INTO users(username,email,password)
-        VALUES(%s,%s,%s)
-        """
-
-        values = (
-            username,
-            email,
-            password
+        user = User(
+            username=username,
+            email=email,
+            password=password
         )
 
-        cursor.execute(query, values)
+        db.session.add(user)
 
-        conn.commit()
+        db.session.commit()
 
-        return "Registration Successful"
+        return redirect(
+            '/login'
+        )
 
     return render_template(
         'register.html'
     )
-
 
 # LOGIN
 @app.route('/login', methods=['GET', 'POST'])
@@ -83,19 +130,10 @@ def login():
         email = request.form['email']
         password = request.form['password']
 
-        query = """
-        SELECT * FROM users
-        WHERE email=%s AND password=%s
-        """
-
-        values = (
-            email,
-            password
-        )
-
-        cursor.execute(query, values)
-
-        user = cursor.fetchone()
+        user = User.query.filter_by(
+            email=email,
+            password=password
+        ).first()
 
         if user:
 
@@ -113,7 +151,6 @@ def login():
         'login.html'
     )
 
-
 # DASHBOARD
 @app.route('/dashboard')
 def dashboard():
@@ -127,7 +164,6 @@ def dashboard():
     return render_template(
         'dashboard.html'
     )
-
 
 # SUBMIT TICKET
 @app.route('/submit_ticket', methods=['POST'])
@@ -166,34 +202,67 @@ def submit_ticket():
         "Contact support"
     )
 
-    query = """
-    INSERT INTO tickets(
-    issue_text,
-    category,
-    priority,
-    status
-    )
-    VALUES(%s,%s,%s,%s)
-    """
+    new_ticket = Ticket(
 
-    values = (
-        ticket,
-        category,
-        priority,
-        "Open"
+        issue_text=ticket,
+
+        category=category,
+
+        priority=priority,
+
+        status="Open",
+
+        assigned_to="Not Assigned"
     )
 
-    cursor.execute(query, values)
+    db.session.add(new_ticket)
 
-    conn.commit()
+    db.session.commit()
+
+    # EMAIL NOTIFICATION
+    try:
+
+        msg = Message(
+
+            'SmartDesk Ticket Created',
+
+            sender=os.environ.get(
+                'MAIL_USERNAME'
+            ),
+
+            recipients=[session['user']]
+
+        )
+
+        msg.body = f"""
+Your ticket was submitted successfully.
+
+Issue:
+{ticket}
+
+Category:
+{category}
+
+Priority:
+{priority}
+"""
+
+        mail.send(msg)
+
+    except Exception as e:
+
+        print(e)
 
     return render_template(
+
         'dashboard.html',
+
         category=category,
+
         priority=priority,
+
         solution=solution
     )
-
 
 # LOGOUT
 @app.route('/logout')
@@ -204,10 +273,14 @@ def logout():
         None
     )
 
+    session.pop(
+        'admin',
+        None
+    )
+
     return redirect(
         '/login'
     )
-
 
 # HISTORY
 @app.route('/history')
@@ -219,42 +292,7 @@ def history():
             '/login'
         )
 
-    search = request.args.get('search')
-
-    status = request.args.get('status')
-
-    query = """
-    SELECT * FROM tickets
-    WHERE 1=1
-    """
-
-    values = []
-
-    if search:
-
-        query += """
-        AND LOWER(issue_text)
-        LIKE LOWER(%s)
-        """
-
-        values.append(
-            "%" + search + "%"
-        )
-
-    if status:
-
-        query += """
-        AND status=%s
-        """
-
-        values.append(status)
-
-    cursor.execute(
-        query,
-        tuple(values)
-    )
-
-    tickets = cursor.fetchall()
+    tickets = Ticket.query.all()
 
     return render_template(
         'history.html',
@@ -263,27 +301,46 @@ def history():
 
 # EXPORT CSV
 @app.route('/export')
-
 def export():
 
-    query = """
-    SELECT * FROM tickets
-    """
+    tickets = Ticket.query.all()
 
-    cursor.execute(query)
+    data = []
 
-    data = cursor.fetchall()
+    for ticket in tickets:
 
-    import pandas as pd
+        data.append([
+
+            ticket.id,
+
+            ticket.issue_text,
+
+            ticket.category,
+
+            ticket.priority,
+
+            ticket.status,
+
+            ticket.assigned_to
+        ])
 
     df = pd.DataFrame(
+
         data,
+
         columns=[
+
             'ID',
+
             'Issue',
+
             'Category',
+
             'Priority',
-            'Status'
+
+            'Status',
+
+            'Assigned To'
         ]
     )
 
@@ -303,22 +360,7 @@ def admin_login():
         username = request.form['username']
         password = request.form['password']
 
-        query = """
-        SELECT * FROM admin
-        WHERE username=%s
-        AND password=%s
-        """
-
-        values = (
-            username,
-            password
-        )
-
-        cursor.execute(query, values)
-
-        admin = cursor.fetchone()
-
-        if admin:
+        if username == "admin" and password == "admin123":
 
             session['admin'] = username
 
@@ -344,18 +386,13 @@ def admin():
             '/admin_login'
         )
 
-    query = """
-    SELECT * FROM tickets
-    """
-
-    cursor.execute(query)
-
-    tickets = cursor.fetchall()
+    tickets = Ticket.query.all()
 
     return render_template(
         'admin.html',
         tickets=tickets
     )
+
 # DELETE TICKET
 @app.route('/delete_ticket/<int:id>')
 def delete_ticket(id):
@@ -366,16 +403,31 @@ def delete_ticket(id):
             '/admin_login'
         )
 
-    query = """
-    DELETE FROM tickets
-    WHERE id=%s
-    """
+    ticket = Ticket.query.get(id)
 
-    values = (id,)
+    db.session.delete(ticket)
 
-    cursor.execute(query, values)
+    db.session.commit()
 
-    conn.commit()
+    return redirect(
+        '/admin'
+    )
+
+# RESOLVE TICKET
+@app.route('/resolve/<int:id>')
+def resolve(id):
+
+    if 'admin' not in session:
+
+        return redirect(
+            '/admin_login'
+        )
+
+    ticket = Ticket.query.get(id)
+
+    ticket.status = "Resolved"
+
+    db.session.commit()
 
     return redirect(
         '/admin'
@@ -393,20 +445,11 @@ def assign(id):
 
     technician = request.form['technician']
 
-    query = """
-    UPDATE tickets
-    SET assigned_to=%s
-    WHERE id=%s
-    """
+    ticket = Ticket.query.get(id)
 
-    values = (
-        technician,
-        id
-    )
+    ticket.assigned_to = technician
 
-    cursor.execute(query, values)
-
-    conn.commit()
+    db.session.commit()
 
     return redirect(
         '/admin'
@@ -422,9 +465,13 @@ def test_email():
 
             'SmartDesk Test Email',
 
-            sender='danielfinney@gmail.com',
+            sender=os.environ.get(
+                'MAIL_USERNAME'
+            ),
 
-            recipients=['danielfinney1935@gmail.com']
+            recipients=[
+                'danielfinney1935@gmail.com'
+            ]
 
         )
 
@@ -440,5 +487,15 @@ SmartDesk Email System Working Successfully
 
         return str(e)
 
+# CREATE DATABASE
+with app.app_context():
+
+    db.create_all()
+
+# RUN APP
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=10000)
+
+    app.run(
+        host="0.0.0.0",
+        port=10000
+    )
