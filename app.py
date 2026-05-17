@@ -488,10 +488,7 @@ SmartDesk Email System Working Successfully
         return str(e)
 
 # CREATE DATABASE
-with app.app_context():
-
-    db.create_all()
-
+# CREATE USER
 @app.route('/create_user')
 def create_user():
 
@@ -517,6 +514,14 @@ def create_user():
     db.session.commit()
 
     return "User Created Successfully"
+
+
+# CREATE DATABASE
+with app.app_context():
+
+    db.create_all()
+
+
 # RUN APP
 if __name__ == "__main__":
 
