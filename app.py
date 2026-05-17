@@ -9,13 +9,17 @@ app = Flask(__name__)
 
 app.secret_key = "smartdesk_secret"
 
+import os
+
 app.config['MAIL_SERVER'] = 'smtp.gmail.com'
+
 app.config['MAIL_PORT'] = 587
+
 app.config['MAIL_USE_TLS'] = True
 
-app.config['MAIL_USERNAME'] = 'danielbendurthi06@gmail.com'
+app.config['MAIL_USERNAME'] = os.environ.get('MAIL_USERNAME')
 
-app.config['MAIL_PASSWORD'] = 'mopodsqufwbzmimj'
+app.config['MAIL_PASSWORD'] = os.environ.get('MAIL_PASSWORD')
 
 mail = Mail(app)
 
@@ -437,4 +441,4 @@ SmartDesk Email System Working Successfully
         return str(e)
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(host="0.0.0.0", port=10000)
