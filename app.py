@@ -492,6 +492,31 @@ with app.app_context():
 
     db.create_all()
 
+@app.route('/create_user')
+def create_user():
+
+    existing_user = User.query.filter_by(
+        email="danielfinney1935@gmail.com"
+    ).first()
+
+    if existing_user:
+
+        return "User Already Exists"
+
+    user = User(
+
+        username="Daniel",
+
+        email="danielfinney1935@gmail.com",
+
+        password="12345"
+    )
+
+    db.session.add(user)
+
+    db.session.commit()
+
+    return "User Created Successfully"
 # RUN APP
 if __name__ == "__main__":
 
