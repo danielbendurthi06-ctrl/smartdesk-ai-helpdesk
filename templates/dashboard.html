@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+<title>SmartDesk Dashboard</title>
+
+<style>
+
+body{
+font-family:'Segoe UI',sans-serif;
+background:linear-gradient(
+135deg,
+#141e30,
+#243b55
+);
+color:white;
+padding:30px;
+margin:0;
+}
+
+.container{
+background:rgba(255,255,255,0.08);
+backdrop-filter:blur(10px);
+padding:25px;
+border-radius:20px;
+box-shadow:0 8px 32px rgba(0,0,0,0.3);
+}
+
+h1{
+margin-bottom:20px;
+}
+
+table{
+width:100%;
+border-collapse:collapse;
+margin-top:20px;
+overflow:hidden;
+border-radius:15px;
+}
+
+th{
+background:#00bcd4;
+padding:15px;
+color:white;
+}
+
+td{
+padding:12px;
+background:rgba(255,255,255,0.05);
+}
+
+input, textarea{
+padding:10px;
+border:none;
+border-radius:10px;
+width:90%;
+margin:10px 0;
+outline:none;
+}
+
+button{
+padding:10px 16px;
+border:none;
+border-radius:10px;
+background:#00bcd4;
+color:white;
+font-weight:bold;
+cursor:pointer;
+transition:0.3s;
+}
+
+button:hover{
+background:#0097a7;
+}
+
+a{
+text-decoration:none;
+padding:8px 12px;
+border-radius:8px;
+color:white;
+}
+
+.resolve{
+background:green;
+}
+
+.delete{
+background:red;
+}
+</style>
+
+</head>
+
+<body>
+
+<div class="container">
+
+<h1>SmartDesk AI Dashboard</h1>
+
+<form action="/submit_ticket" method="post">
+
+<textarea
+name="ticket"
+placeholder="Describe your issue">
+</textarea>
+
+<button type="submit">
+Submit Ticket
+</button>
+
+</form>
+
+{% if category %}
+
+<div class="result">
+
+<h2>
+Category:
+{{category}}
+</h2>
+
+<h2>
+Priority:
+{{priority}}
+</h2>
+
+<h2>
+Solution:
+{{solution}}
+</h2>
+
+</div>
+
+{% endif %}
+
+</div>
+
+</body>
+</html>

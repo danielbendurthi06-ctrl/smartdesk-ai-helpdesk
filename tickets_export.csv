@@ -1,0 +1,13 @@
+ID,Issue,Category,Priority,Status
+1,,Network,High,Resolved
+2,My WiFi is not connecting,Network,High,Resolved
+3,My WiFi is not connecting,Network,High,Resolved
+4,Forgot my account password,Network,High,Resolved
+5,Mouse is not working,Network,Low,Resolved
+6,Application keeps crashing,Software,High,Resolved
+7,WiFi not connecting,Network,High,Resolved
+8,Mouse,Hardware,High,Resolved
+9,Mouse,Hardware,High,Resolved
+10,Software installation failed,Network,High,Open
+11,Internet connection slow,Network,High,Open
+12,Mouse not responding,Hardware,Low,Open

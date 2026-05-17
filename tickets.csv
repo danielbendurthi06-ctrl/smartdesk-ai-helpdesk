@@ -1,0 +1,11 @@
+Ticket_Text,Category,Priority
+Laptop not connecting to WiFi,Network,High
+Forgot account password,Account,Medium
+System showing blue screen error,Hardware,High
+Application not opening,Software,Low
+Internet connection is very slow,Network,Medium
+Unable to login into system,Account,High
+Mouse not working properly,Hardware,Low
+Software crashing frequently,Software,Medium
+Printer not detected,Hardware,Medium
+VPN connection failed,Network,High
