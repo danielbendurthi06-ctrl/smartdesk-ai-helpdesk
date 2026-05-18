@@ -2,39 +2,101 @@
 <html>
 
 <head>
-<title>Register</title>
+
+<title>SmartDesk Register</title>
 
 <style>
 
 body{
-font-family:Arial;
-background:#f5f5f5;
-text-align:center;
-padding:50px;
+margin:0;
+padding:0;
+font-family:'Segoe UI',sans-serif;
+height:100vh;
+display:flex;
+justify-content:center;
+align-items:center;
+background:linear-gradient(
+135deg,
+#141e30,
+#243b55
+);
+overflow:hidden;
 }
 
 .container{
-background:white;
 width:400px;
-margin:auto;
-padding:30px;
-border-radius:10px;
-box-shadow:0px 0px 10px gray;
+padding:40px;
+border-radius:20px;
+background:rgba(255,255,255,0.08);
+backdrop-filter:blur(15px);
+box-shadow:0 8px 32px rgba(0,0,0,0.3);
+text-align:center;
+color:white;
+animation:fadeIn 1s ease;
+}
+
+h1{
+margin-bottom:30px;
+font-size:32px;
 }
 
 input{
-width:90%;
-padding:10px;
-margin:10px;
+width:100%;
+padding:14px;
+margin:12px 0;
+border:none;
+border-radius:12px;
+outline:none;
+font-size:16px;
+background:rgba(255,255,255,0.15);
+color:white;
+}
+
+input::placeholder{
+color:#ddd;
 }
 
 button{
-padding:10px 20px;
-background:blue;
-color:white;
+width:100%;
+padding:14px;
+margin-top:20px;
 border:none;
-border-radius:5px;
+border-radius:12px;
+background:#00bcd4;
+color:white;
+font-size:18px;
+font-weight:bold;
 cursor:pointer;
+transition:0.3s;
+}
+
+button:hover{
+background:#0097a7;
+transform:scale(1.03);
+}
+
+a{
+color:#00e5ff;
+text-decoration:none;
+font-weight:bold;
+}
+
+p{
+margin-top:20px;
+}
+
+@keyframes fadeIn{
+
+from{
+opacity:0;
+transform:translateY(20px);
+}
+
+to{
+opacity:1;
+transform:translateY(0);
+}
+
 }
 
 </style>
@@ -45,33 +107,40 @@ cursor:pointer;
 
 <div class="container">
 
-<h2>User Registration</h2>
+<h1>SmartDesk Register</h1>
 
-<form action="/register" method="post">
+<form method="POST">
 
 <input
 type="text"
 name="username"
-placeholder="Username"
+placeholder="Enter Username"
 required>
 
 <input
 type="email"
 name="email"
-placeholder="Email"
+placeholder="Enter Email"
 required>
 
 <input
 type="password"
 name="password"
-placeholder="Password"
+placeholder="Enter Password"
 required>
 
 <button type="submit">
-Register
+Create Account
 </button>
 
 </form>
+
+<p>
+Already have account?
+<a href="/login">
+Login
+</a>
+</p>
 
 </div>
 
