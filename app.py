@@ -219,7 +219,7 @@ def submit_ticket():
 
     db.session.commit()
 
-    
+
 
     # MOCK EMAIL NOTIFICATION
     email_message = f"""
@@ -476,7 +476,7 @@ def create_user():
 # CREATE DATABASE
 with app.app_context():
 
-    db.Screate_all()
+    db.create_all()
 
 # RUN APP
 if __name__ == "__main__":
