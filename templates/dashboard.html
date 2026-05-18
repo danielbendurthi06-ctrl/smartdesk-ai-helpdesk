@@ -119,6 +119,24 @@ Category:
 {{category}}
 </h2>
 
+{% if email_message %}
+
+<div
+style="
+background:#1abc9c;
+padding:15px;
+border-radius:10px;
+margin-top:20px;
+color:white;
+font-size:18px;
+">
+
+<pre>{{email_message}}</pre>
+
+</div>
+
+{% endif %}
+
 <h2>
 Priority:
 {{priority}}
@@ -128,6 +146,29 @@ Priority:
 Solution:
 {{solution}}
 </h2>
+
+{% if email_message %}
+
+<div
+style="
+background:#1abc9c;
+padding:20px;
+border-radius:15px;
+margin-top:20px;
+color:white;
+font-size:18px;
+box-shadow:0 0 10px rgba(0,0,0,0.3);
+">
+
+<h2>📧 Email Notification</h2>
+
+<pre style="color:white;">
+{{email_message}}
+</pre>
+
+</div>
+
+{% endif %}
 
 </div>
 

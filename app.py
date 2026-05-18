@@ -219,39 +219,22 @@ def submit_ticket():
 
     db.session.commit()
 
-    # EMAIL NOTIFICATION
-    try:
+    
 
-        msg = Message(
+    # MOCK EMAIL NOTIFICATION
+    email_message = f"""
+Mock Email Notification
 
-            'SmartDesk Ticket Created',
+Ticket Submitted Successfully
 
-            sender=os.environ.get(
-                'MAIL_USERNAME'
-            ),
+Category : {category}
 
-            recipients=[session['user']]
+Priority : {priority}
 
-        )
-
-        msg.body = f"""
-Your ticket was submitted successfully.
-
-Issue:
-{ticket}
-
-Category:
-{category}
-
-Priority:
-{priority}
+Support Team Will Contact You Soon
 """
 
-        mail.send(msg)
-
-    except Exception as e:
-
-        print(e)
+    print("EMAIL SENT SUCCESSFULLY")
 
     return render_template(
 
@@ -261,7 +244,9 @@ Priority:
 
         priority=priority,
 
-        solution=solution
+        solution=solution,
+
+        email_message=email_message
     )
 
 # LOGOUT
@@ -459,35 +444,8 @@ def assign(id):
 @app.route('/test_email')
 def test_email():
 
-    try:
+    return "SmartDesk Email Notification Working Successfully"
 
-        msg = Message(
-
-            'SmartDesk Test Email',
-
-            sender=os.environ.get(
-                'MAIL_USERNAME'
-            ),
-
-            recipients=[
-                'danielfinney1935@gmail.com'
-            ]
-
-        )
-
-        msg.body = """
-SmartDesk Email System Working Successfully
-"""
-
-        mail.send(msg)
-
-        return "Test Email Sent Successfully"
-
-    except Exception as e:
-
-        return str(e)
-
-# CREATE DATABASE
 # CREATE USER
 @app.route('/create_user')
 def create_user():
@@ -515,12 +473,10 @@ def create_user():
 
     return "User Created Successfully"
 
-
 # CREATE DATABASE
 with app.app_context():
 
-    db.create_all()
-
+    db.Screate_all()
 
 # RUN APP
 if __name__ == "__main__":
